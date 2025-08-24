@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unit 4: Jobs — Mini Quiz (Sample)</title>
+  <style>
+    :root{
+      --bg:#f7f7fb;
+      --card:#ffffff;
+      --text:#222;
+      --muted:#666;
+      --accent:#3b82f6;
+      --correct:#10b981;
+      --wrong:#ef4444;
+      --shadow: 0 8px 24px rgba(0,0,0,.08);
+      --radius: 16px;
+    }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";}
+    .container{max-width:720px;margin:0 auto;padding:24px 16px 64px;}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;}
+    h1{font-size:20px;margin:0 0 8px 0;}
+    .sub{color:var(--muted);font-size:14px;margin-bottom:12px}
+    .progress-wrap{display:flex;align-items:center;gap:8px;margin:8px 0 16px}
+    progress{width:100%;height:12px;-webkit-appearance:none;appearance:none;border:none;border-radius:999px;overflow:hidden;background:#e5e7eb}
+    progress::-webkit-progress-bar{background:#e5e7eb}
+    progress::-webkit-progress-value{background:var(--accent)}
+    .q{font-size:18px;line-height:1.4;margin:6px 0 16px}
+    .options{display:grid;gap:10px}
+    .btn{
+      display:block;width:100%;text-align:left;border:2px solid #e5e7eb;border-radius:12px;
+      background:#fff;padding:14px 14px;font-size:16px;cursor:pointer;transition:.15s box-shadow,.15s transform,.15s border-color;
+    }
+    .btn:hover{box-shadow:0 8px 20px rgba(0,0,0,.06);transform:translateY(-1px)}
+    .btn[disabled]{opacity:.6;pointer-events:none}
+    .choice{display:flex;align-items:center;gap:10px}
+    .badge{width:28px;height:28px;display:inline-grid;place-items:center;font-weight:700;border-radius:8px;background:#f1f5f9;color:#111}
+    .state{margin-top:10px;font-size:15px;min-height:24px}
+    .state.correct{color:var(--correct)}
+    .state.wrong{color:var(--wrong)}
+    .footer{display:flex;gap:10px;margin-top:16px}
+    .primary{background:var(--accent);border-color:var(--accent);color:#fff;text-align:center}
+    .outline{background:#fff;color:#111}
+    .pill{border-radius:999px;padding:10px 16px;font-weight:600}
+    .score{font-size:14px;color:var(--muted)}
+    .summary h2{margin:0 0 8px 0}
+    .small{font-size:13px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Unit 4: Jobs — Mini Quiz (Sample)</h1>
+      <div class="sub">Practice on mobile • 2 words × 3 questions = 6 total</div>
+      <div class="progress-wrap"><progress id="bar" max="6" value="0"></progress><div class="score" id="scoreBox">0 / 6</div></div>
+      <div id="quiz"></div>
+    </div>
+  </div>
+  <script>
+    // --- Question bank (Sample: doctor & farmer) ---
+    const QUESTIONS = [
+      // Doctor
+      {
+        vocab: "doctor",
+        prompt: "This person helps sick people. <b>Who is he?</b>",
+        options: ["Teacher","Doctor","Farmer","Driver"],
+        answer: 1,
+        explain: "A doctor helps sick people."
+      },
+      {
+        vocab: "doctor",
+        prompt: "This person works in a hospital. <b>Where is he?</b>",
+        options: ["At the school","At the hospital","At the farm","At the market"],
+        answer: 1,
+        explain: "A doctor works at the hospital."
+      },
+      {
+        vocab: "doctor",
+        prompt: "This person helps sick people. <b>Is he a doctor?</b>",
+        options: ["Yes, he is.","No, he is not.","Yes, it is.","No, it isn't."],
+        answer: 0,
+        explain: "We say: Yes, he is."
+      },
+      // Farmer
+      {
+        vocab: "farmer",
+        prompt: "This person grows plants and raises animals. <b>Who is he?</b>",
+        options: ["Doctor","Farmer","Pilot","Teacher"],
+        answer: 1,
+        explain: "A farmer grows plants and takes care of animals."
+      },
+      {
+        vocab: "farmer",
+        prompt: "This person works on a farm. <b>Where is he?</b>",
+        options: ["At the airport","At the farm","At the fire station","At the zoo"],
+        answer: 1,
+        explain: "A farmer works at the farm."
+      },
+      {
+        vocab: "farmer",
+        prompt: "He works on a farm. <b>Is he a farmer?</b>",
+        options: ["Yes, he is.","No, he is not.","Yes, it is.","No, it isn't."],
+        answer: 0,
+        explain: "We say: Yes, he is."
+      }
+    ];
+
+    // Shuffle questions lightly for practice variety (deterministic if needed)
+    function shuffle(arr){
+      for(let i=arr.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]] = [arr[j],arr[i]];
+      }
+      return arr;
+    }
+    const questions = shuffle([...QUESTIONS]);
+
+    // --- State ---
+    let index = 0;
+    let score = 0;
+    const quiz = document.getElementById('quiz');
+    const bar = document.getElementById('bar');
+    const scoreBox = document.getElementById('scoreBox');
+
+    function render(){
+      if(index >= questions.length){ return renderSummary(); }
+      const q = questions[index];
+      bar.value = index;
+      scoreBox.textContent = `${score} / ${questions.length}`;
+      quiz.innerHTML = `
+        <div class="small">Word: <b>${q.vocab}</b> | Question ${index+1} of ${questions.length}</div>
+        <div class="q">${q.prompt}</div>
+        <div class="options">
+          ${q.options.map((opt,i)=>`
+            <button class="btn outline" data-choice="${i}">
+              <span class="choice">
+                <span class="badge">${String.fromCharCode(97+i)}.</span> <span>${opt}</span>
+              </span>
+            </button>
+          `).join('')}
+        </div>
+        <div class="state" id="state"></div>
+        <div class="footer">
+          <button class="btn pill" id="skipBtn">Skip</button>
+          <button class="btn pill primary" id="nextBtn" disabled>Next</button>
+        </div>
+      `;
+      bind(q);
+    }
+
+    function bind(q){
+      const buttons = [...document.querySelectorAll('button[data-choice]')];
+      const state = document.getElementById('state');
+      const nextBtn = document.getElementById('nextBtn');
+      const skipBtn = document.getElementById('skipBtn');
+      let locked = false;
+
+      buttons.forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          if(locked) return;
+          locked = true;
+          const choice = +btn.dataset.choice;
+          buttons.forEach(b=>b.disabled = true);
+          nextBtn.disabled = false;
+
+          if(choice === q.answer){
+            btn.style.borderColor = "var(--correct)";
+            state.className = "state correct";
+            state.textContent = "Correct! " + q.explain;
+            score++;
+          }else{
+            btn.style.borderColor = "var(--wrong)";
+            state.className = "state wrong";
+            state.textContent = "Oops! " + q.explain + ` (Answer: ${String.fromCharCode(97+q.answer)}. ${q.options[q.answer]})`;
+            // highlight correct
+            const correctBtn = buttons.find(b => +b.dataset.choice === q.answer);
+            correctBtn.style.borderColor = "var(--correct)";
+          }
+          scoreBox.textContent = `${score} / ${questions.length}`;
+        });
+      });
+
+      nextBtn.addEventListener('click', ()=>{
+        index++;
+        render();
+      });
+      skipBtn.addEventListener('click', ()=>{
+        index++;
+        render();
+      });
+    }
+
+    function renderSummary(){
+      bar.value = questions.length;
+      scoreBox.textContent = `${score} / ${questions.length}`;
+      quiz.innerHTML = `
+        <div class="summary">
+          <h2>Great job! 🎉</h2>
+          <p>You scored <b>${score}</b> out of <b>${questions.length}</b>.</p>
+          <div class="footer">
+            <button class="btn pill primary" id="again">Try Again</button>
+          </div>
+          <p class="small">This is a sample (2 words). We can add all 30 words with 3 questions each.</p>
+        </div>
+      `;
+      document.getElementById('again').addEventListener('click', ()=>{
+        index = 0; score = 0; shuffle(questions); render();
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>
