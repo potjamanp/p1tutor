@@ -105,7 +105,7 @@
         // Q2: Who works here?
         bank.push({
           tag: place,
-          prompt: `People come to this place. <b>Who works here?</b>`,
+          prompt: `People come to ${q.tag}. <b>Who works here?</b>`,
           options: [whoCorrect, ...whoDistractors],
           answer: 0,
           explain: `A ${whoCorrect} works here.`
