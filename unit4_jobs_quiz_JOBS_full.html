@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unit 4: Jobs — Jobs Quiz (20 words, 60 questions)</title>
+  <meta name="description" content="Grade 1 English • Jobs vocabulary • 20 words × 3 = 60 questions" />
+  <style>
+    :root{
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --accent:#2563eb;
+      --correct:#16a34a;
+      --wrong:#dc2626;
+      --shadow: 0 10px 28px rgba(2,6,23,.12);
+      --radius: 18px;
+    }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";}
+    .container{max-width:760px;margin:0 auto;padding:28px 16px 72px;}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;}
+    h1{font-size:20px;margin:0 0 8px 0;}
+    .sub{color:var(--muted);font-size:14px;margin-bottom:12px}
+    .progress{display:flex;align-items:center;gap:10px;margin:4px 0 16px}
+    progress{width:100%;height:12px;-webkit-appearance:none;appearance:none;border:none;border-radius:999px;overflow:hidden;background:#e2e8f0}
+    progress::-webkit-progress-value{background:var(--accent)}
+    .small{font-size:13px;color:var(--muted)}
+    .q{font-size:18px;line-height:1.45;margin:8px 0 16px}
+    .options{display:grid;gap:10px}
+    .btn{
+      display:block;width:100%;text-align:left;border:2px solid #e2e8f0;border-radius:14px;
+      background:#fff;padding:14px;font-size:16px;cursor:pointer;transition:.15s box-shadow,.15s transform,.15s border-color;
+    }
+    .btn:hover{box-shadow:0 10px 24px rgba(2,6,23,.08);transform:translateY(-1px)}
+    .btn[disabled]{opacity:.6;pointer-events:none}
+    .choice{display:flex;align-items:center;gap:10px}
+    .badge{width:28px;height:28px;display:inline-grid;place-items:center;font-weight:700;border-radius:8px;background:#eef2ff;color:#111}
+    .state{margin-top:10px;font-size:15px;min-height:24px}
+    .state.correct{color:var(--correct)}
+    .state.wrong{color:var(--wrong)}
+    .footer{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+    .pill{border-radius:999px;padding:10px 16px;font-weight:600}
+    .primary{background:var(--accent);border-color:var(--accent);color:#fff;text-align:center}
+    .ghost{background:#fff;color:#111}
+    .meta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .score{font-size:14px;color:var(--muted)}
+    .summary h2{margin:0 0 8px 0}
+    .tips{font-size:13px;color:var(--muted);margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="meta">
+        <div>
+          <h1>Unit 4: Jobs — Jobs Quiz (20 words, 60 questions)</h1>
+          <div class="sub">Grade 1 English • Jobs vocabulary • 20 words × 3 = 60 questions</div>
+        </div>
+        <div class="score" id="scoreBox">0 / 0</div>
+      </div>
+      <div class="progress"><progress id="bar" max="0" value="0"></progress></div>
+      <div id="quiz"></div>
+      <div class="tips">Tip: Questions avoid naming the place inside the prompt, so kids infer the correct answer.</div>
+    </div>
+  </div>
+  <script>
+    const BANK = [{"tag": "doctor", "prompt": "This person helps sick people. <b>Who is he?</b>", "options": ["Farmer", "Doctor", "Firefighter", "Housewife"], "answer": 1, "explain": "A doctor helps sick people."}, {"tag": "doctor", "prompt": "He helps sick people. Where is he?", "options": ["At the school", "At the hospital", "At the farm", "At the market"], "answer": 1, "explain": "At the hospital is correct."}, {"tag": "doctor", "prompt": "This person helps sick people. Is he a doctor?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "farmer", "prompt": "This person grows rice and vegetables. <b>Who is he?</b>", "options": ["Doctor", "Farmer", "Firefighter", "Housewife"], "answer": 1, "explain": "A farmer grows rice and vegetables."}, {"tag": "farmer", "prompt": "He grows food for us. Where is he?", "options": ["At the airport", "At the farm", "At the zoo", "At the fire station"], "answer": 1, "explain": "At the farm is correct."}, {"tag": "farmer", "prompt": "This person grows rice. Is he a farmer?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "firefighter", "prompt": "This person puts out fires. <b>Who is he?</b>", "options": ["Doctor", "Firefighter", "Farmer", "Housewife"], "answer": 1, "explain": "A firefighter puts out fires."}, {"tag": "firefighter", "prompt": "He uses a big red truck. Where is he?", "options": ["At the fire station", "At the classroom", "At the farm", "At the post office"], "answer": 0, "explain": "At the fire station is correct."}, {"tag": "firefighter", "prompt": "This person puts out fires. Is he a firefighter?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "housewife", "prompt": "This person cooks and cleans at home. <b>Who is he?</b>", "options": ["Doctor", "Housewife", "Farmer", "Firefighter"], "answer": 1, "explain": "A housewife cooks and cleans at home."}, {"tag": "housewife", "prompt": "He takes care of the family. Where is he?", "options": ["At the house", "At the airport", "At the school", "At the zoo"], "answer": 0, "explain": "At the house is correct."}, {"tag": "housewife", "prompt": "This person cooks and cleans at home. Is he a housewife?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "pilot", "prompt": "This person flies a plane. <b>Who is he?</b>", "options": ["Doctor", "Pilot", "Farmer", "Firefighter"], "answer": 1, "explain": "A pilot flies a plane."}, {"tag": "pilot", "prompt": "He checks the plane before flying. Where is he?", "options": ["At the airport", "At the farm", "At the zoo", "At the police station"], "answer": 0, "explain": "At the airport is correct."}, {"tag": "pilot", "prompt": "This person flies a plane. Is he a pilot?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "police", "prompt": "This person keeps people safe. <b>Who is he?</b>", "options": ["Doctor", "Police", "Farmer", "Firefighter"], "answer": 1, "explain": "A police keeps people safe."}, {"tag": "police", "prompt": "He wears a uniform and helps people. Where is he?", "options": ["At the zoo", "At the police station", "At the school", "At the farm"], "answer": 1, "explain": "At the police station is correct."}, {"tag": "police", "prompt": "This person keeps people safe. Is he a police officer?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "postman", "prompt": "This person brings letters and parcels. <b>Who is he?</b>", "options": ["Doctor", "Postman", "Farmer", "Firefighter"], "answer": 1, "explain": "A postman brings letters and parcels."}, {"tag": "postman", "prompt": "He carries a bag of letters. Where is he?", "options": ["At the fire station", "At the post office", "At the farm", "At the zoo"], "answer": 1, "explain": "At the post office is correct."}, {"tag": "postman", "prompt": "This person brings letters. Is he a postman?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "pupil", "prompt": "This person learns in class. <b>Who is he?</b>", "options": ["Doctor", "Pupil", "Farmer", "Firefighter"], "answer": 1, "explain": "A pupil learns in class."}, {"tag": "pupil", "prompt": "He reads and writes with friends. Where is he?", "options": ["At the classroom", "At the farm", "At the airport", "At the police station"], "answer": 0, "explain": "At the classroom is correct."}, {"tag": "pupil", "prompt": "This person learns in class. Is he a pupil?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "teacher", "prompt": "This person teaches students. <b>Who is he?</b>", "options": ["Doctor", "Teacher", "Farmer", "Firefighter"], "answer": 1, "explain": "A teacher teaches students."}, {"tag": "teacher", "prompt": "He writes on the board. Where is he?", "options": ["At the classroom", "At the post office", "At the farm", "At the airport"], "answer": 0, "explain": "At the classroom is correct."}, {"tag": "teacher", "prompt": "This person teaches students. Is he a teacher?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "zookeeper", "prompt": "This person takes care of animals at the zoo. <b>Who is he?</b>", "options": ["Doctor", "Zookeeper", "Farmer", "Firefighter"], "answer": 1, "explain": "A zookeeper takes care of animals at the zoo."}, {"tag": "zookeeper", "prompt": "He feeds lions and monkeys. Where is he?", "options": ["At the zoo", "At the school", "At the farm", "At the airport"], "answer": 0, "explain": "At the zoo is correct."}, {"tag": "zookeeper", "prompt": "This person takes care of animals. Is he a zookeeper?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "actor", "prompt": "This person acts in movies or plays. <b>Who is he?</b>", "options": ["Doctor", "Actor", "Farmer", "Firefighter"], "answer": 1, "explain": "A actor acts in movies or plays."}, {"tag": "actor", "prompt": "He stands on the stage. Where is he?", "options": ["At the theater", "At the farm", "At the hospital", "At the school"], "answer": 0, "explain": "At the theater is correct."}, {"tag": "actor", "prompt": "This person acts in plays. Is he an actor?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "astronaut", "prompt": "This person travels in space. <b>Who is he?</b>", "options": ["Doctor", "Astronaut", "Farmer", "Firefighter"], "answer": 1, "explain": "A astronaut travels in space."}, {"tag": "astronaut", "prompt": "He rides a rocket. Where is he?", "options": ["In space", "At the airport", "At the farm", "At the school"], "answer": 0, "explain": "In space is correct."}, {"tag": "astronaut", "prompt": "This person travels in space. Is he an astronaut?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "athlete", "prompt": "This person runs and plays sports. <b>Who is he?</b>", "options": ["Doctor", "Athlete", "Farmer", "Firefighter"], "answer": 1, "explain": "A athlete runs and plays sports."}, {"tag": "athlete", "prompt": "He plays on a big field. Where is he?", "options": ["At the stadium", "At the classroom", "At the farm", "At the zoo"], "answer": 0, "explain": "At the stadium is correct."}, {"tag": "athlete", "prompt": "This person plays sports. Is he an athlete?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "chef", "prompt": "This person cooks food. <b>Who is he?</b>", "options": ["Doctor", "Chef", "Farmer", "Firefighter"], "answer": 1, "explain": "A chef cooks food."}, {"tag": "chef", "prompt": "He works with pots and pans. Where is he?", "options": ["In the kitchen", "At the school", "At the farm", "At the zoo"], "answer": 0, "explain": "In the kitchen is correct."}, {"tag": "chef", "prompt": "This person cooks food. Is he a chef?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "engineer", "prompt": "This person builds machines or bridges. <b>Who is he?</b>", "options": ["Doctor", "Engineer", "Farmer", "Firefighter"], "answer": 1, "explain": "A engineer builds machines or bridges."}, {"tag": "engineer", "prompt": "He uses tools and plans. Where is he?", "options": ["At the workshop", "At the classroom", "At the zoo", "At the farm"], "answer": 0, "explain": "At the workshop is correct."}, {"tag": "engineer", "prompt": "This person builds machines. Is he an engineer?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "nurse", "prompt": "This person helps sick people too. <b>Who is he?</b>", "options": ["Doctor", "Nurse", "Farmer", "Firefighter"], "answer": 1, "explain": "A nurse helps sick people too."}, {"tag": "nurse", "prompt": "He gives care to sick people. Where is he?", "options": ["At the hospital", "At the farm", "At the airport", "At the zoo"], "answer": 0, "explain": "At the hospital is correct."}, {"tag": "nurse", "prompt": "This person helps sick people. Is he a nurse?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "scientist", "prompt": "This person does experiments. <b>Who is he?</b>", "options": ["Doctor", "Scientist", "Farmer", "Firefighter"], "answer": 1, "explain": "A scientist does experiments."}, {"tag": "scientist", "prompt": "He mixes and tests things. Where is he?", "options": ["In the lab", "At the farm", "At the police station", "At the airport"], "answer": 0, "explain": "In the lab is correct."}, {"tag": "scientist", "prompt": "This person does experiments. Is he a scientist?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "shopkeeper", "prompt": "This person sells things in a small store. <b>Who is he?</b>", "options": ["Doctor", "Shopkeeper", "Farmer", "Firefighter"], "answer": 1, "explain": "A shopkeeper sells things in a small store."}, {"tag": "shopkeeper", "prompt": "He stands at the counter. Where is he?", "options": ["At the shop", "At the school", "At the zoo", "At the farm"], "answer": 0, "explain": "At the shop is correct."}, {"tag": "shopkeeper", "prompt": "This person sells things. Is he a shopkeeper?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "singer", "prompt": "This person sings songs. <b>Who is he?</b>", "options": ["Doctor", "Singer", "Farmer", "Firefighter"], "answer": 1, "explain": "A singer sings songs."}, {"tag": "singer", "prompt": "He sings for many people. Where is he?", "options": ["On the stage", "At the school", "At the farm", "At the zoo"], "answer": 0, "explain": "On the stage is correct."}, {"tag": "singer", "prompt": "This person sings songs. Is he a singer?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}, {"tag": "vet", "prompt": "This person helps sick animals. <b>Who is he?</b>", "options": ["Doctor", "Vet", "Farmer", "Firefighter"], "answer": 1, "explain": "A vet helps sick animals."}, {"tag": "vet", "prompt": "He checks dogs and cats. Where is he?", "options": ["At the animal hospital", "At the farm", "At the airport", "At the school"], "answer": 0, "explain": "At the animal hospital is correct."}, {"tag": "vet", "prompt": "This person helps sick animals. Is he a vet?", "options": ["Yes, he is.", "No, he is not.", "Yes, it is.", "No, it isn't."], "answer": 0, "explain": "We answer: Yes, he is."}];
+
+    function shuffle(arr){
+      for(let i=arr.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]] = [arr[j],arr[i]];
+      }
+      return arr;
+    }
+
+    const QUESTIONS = shuffle([...BANK]);
+    let i = 0, score = 0;
+    const quiz = document.getElementById('quiz');
+    const bar = document.getElementById('bar');
+    const scoreBox = document.getElementById('scoreBox');
+    bar.max = QUESTIONS.length; bar.value = 0; scoreBox.textContent = `0 / ${QUESTIONS.length}`;
+
+    function render(){
+      if(i >= QUESTIONS.length) return summary();
+      const q = QUESTIONS[i];
+      bar.value = i;
+      scoreBox.textContent = `${score} / ${QUESTIONS.length}`;
+      quiz.innerHTML = `
+        <div class="small">Word: <b>${q.tag}</b> • Question ${i+1} of ${QUESTIONS.length}</div>
+        <div class="q">${q.prompt}</div>
+        <div class="options">
+          ${q.options.map((opt,idx)=>`
+            <button class="btn ghost" data-choice="${idx}">
+              <span class="choice">
+                <span class="badge">${String.fromCharCode(97+idx)}.</span>
+                <span>${opt}</span>
+              </span>
+            </button>`).join('')}
+        </div>
+        <div class="state" id="state"></div>
+        <div class="footer">
+          <button class="btn pill ghost" id="skip">Skip</button>
+          <button class="btn pill primary" id="next" disabled>Next</button>
+          <button class="btn pill ghost" id="retry">Restart</button>
+        </div>`;
+      bind(q);
+    }
+
+    function bind(q){
+      const btns = [...document.querySelectorAll('[data-choice]')];
+      const state = document.getElementById('state');
+      const next = document.getElementById('next');
+      const skip = document.getElementById('skip');
+      const retry = document.getElementById('retry');
+      let locked = false;
+
+      btns.forEach(b=>b.addEventListener('click',()=>{
+        if(locked) return; locked = true;
+        const c = +b.dataset.choice;
+        btns.forEach(x=>x.disabled = true);
+        next.disabled = false;
+        if(c===q.answer){
+          b.style.borderColor = "var(--correct)";
+          state.className = "state correct";
+          state.textContent = "Correct! " + q.explain;
+          score++;
+        }else{
+          b.style.borderColor = "var(--wrong)";
+          state.className = "state wrong";
+          state.textContent = "Not quite. " + q.explain + ` (Answer: ${String.fromCharCode(97+q.answer)}. ${q.options[q.answer]})`;
+          const right = btns.find(x=>+x.dataset.choice===q.answer);
+          right.style.borderColor = "var(--correct)";
+        }
+        scoreBox.textContent = `${score} / ${QUESTIONS.length}`;
+      }));
+
+      next.addEventListener('click', ()=>{ i++; render(); });
+      skip.addEventListener('click', ()=>{ i++; render(); });
+      retry.addEventListener('click', ()=>{ i=0; score=0; shuffle(QUESTIONS); render(); });
+    }
+
+    function summary(){
+      bar.value = QUESTIONS.length;
+      scoreBox.textContent = `${score} / ${QUESTIONS.length}`;
+      quiz.innerHTML = `
+        <div class="summary">
+          <h2>All done! 🎉</h2>
+          <p>Your score: <b>${score}</b> / <b>${QUESTIONS.length}</b></p>
+          <div class="footer">
+            <button class="btn pill primary" id="again">Try Again</button>
+          </div>
+          <p class="tips">Great practice! You can share this page link so kids can play on any phone or tablet.</p>
+        </div>`;
+      document.getElementById('again').addEventListener('click', ()=>{ i = 0; score = 0; shuffle(QUESTIONS); render(); });
+    }
+    render();
+  </script>
+</body>
+</html>
