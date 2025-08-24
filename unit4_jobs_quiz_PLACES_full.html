@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unit 4: Jobs — Places Quiz (10 words, 30 questions)</title>
+  <meta name="description" content="Grade 1 English • Places vocabulary • 10 words × 3 = 30 questions" />
+  <style>
+    :root{
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --accent:#2563eb;
+      --correct:#16a34a;
+      --wrong:#dc2626;
+      --shadow: 0 10px 28px rgba(2,6,23,.12);
+      --radius: 18px;
+    }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";}
+    .container{max-width:760px;margin:0 auto;padding:28px 16px 72px;}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;}
+    h1{font-size:20px;margin:0 0 8px 0;}
+    .sub{color:var(--muted);font-size:14px;margin-bottom:12px}
+    .progress{display:flex;align-items:center;gap:10px;margin:4px 0 16px}
+    progress{width:100%;height:12px;-webkit-appearance:none;appearance:none;border:none;border-radius:999px;overflow:hidden;background:#e2e8f0}
+    progress::-webkit-progress-value{background:var(--accent)}
+    .small{font-size:13px;color:var(--muted)}
+    .q{font-size:18px;line-height:1.45;margin:8px 0 16px}
+    .options{display:grid;gap:10px}
+    .btn{
+      display:block;width:100%;text-align:left;border:2px solid #e2e8f0;border-radius:14px;
+      background:#fff;padding:14px;font-size:16px;cursor:pointer;transition:.15s box-shadow,.15s transform,.15s border-color;
+    }
+    .btn:hover{box-shadow:0 10px 24px rgba(2,6,23,.08);transform:translateY(-1px)}
+    .btn[disabled]{opacity:.6;pointer-events:none}
+    .choice{display:flex;align-items:center;gap:10px}
+    .badge{width:28px;height:28px;display:inline-grid;place-items:center;font-weight:700;border-radius:8px;background:#eef2ff;color:#111}
+    .state{margin-top:10px;font-size:15px;min-height:24px}
+    .state.correct{color:var(--correct)}
+    .state.wrong{color:var(--wrong)}
+    .footer{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+    .pill{border-radius:999px;padding:10px 16px;font-weight:600}
+    .primary{background:var(--accent);border-color:var(--accent);color:#fff;text-align:center}
+    .ghost{background:#fff;color:#111}
+    .meta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .score{font-size:14px;color:var(--muted)}
+    .summary h2{margin:0 0 8px 0}
+    .tips{font-size:13px;color:var(--muted);margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="meta">
+        <div>
+          <h1>Unit 4: Jobs — Places Quiz (10 words, 30 questions)</h1>
+          <div class="sub">Grade 1 English • Places vocabulary • 10 words × 3 = 30 questions</div>
+        </div>
+        <div class="score" id="scoreBox">0 / 0</div>
+      </div>
+      <div class="progress"><progress id="bar" max="0" value="0"></progress></div>
+      <div id="quiz"></div>
+      <div class="tips">Tip: Questions avoid naming the place inside the prompt, so kids infer the correct answer.</div>
+    </div>
+  </div>
+  <script>
+    const BANK = [{"tag": "hospital", "prompt": "We go here when we are sick. <b>What is it?</b>", "options": ["hospital", "farm", "fire station", "house"], "answer": 0, "explain": "It is a hospital."}, {"tag": "hospital", "prompt": "People come to this place. <b>Who works here?</b>", "options": ["doctor", "farmer", "teacher", "postman"], "answer": 0, "explain": "A doctor works here."}, {"tag": "hospital", "prompt": "This place is for we go here when we are sick. <b>Is it a hospital?</b>", "options": ["Yes, it is.", "No, it isn't.", "Yes, he is.", "No, he is not."], "answer": 0, "explain": "We answer: Yes, it is."}, {"tag": "farm", "prompt": "We grow rice and vegetables here. <b>What is it?</b>", "options": ["farm", "hospital", "fire station", "house"], "answer": 0, "explain": "It is a farm."}, {"tag": "farm", "prompt": "People come to this place. <b>Who works here?</b>", "options": ["farmer", "pilot", "police", "teacher"], "answer": 0, "explain": "A farmer works here."}, {"tag": "farm", "prompt": "This place is for we grow rice and vegetables here. <b>Is it a farm?</b>", "options": ["Yes, it is.", "No, it isn't.", "Yes, he is.", "No, he is not."], "answer": 0, "explain": "We answer: Yes, it is."}, {"tag": "fire station", "prompt": "Fire trucks are here. <b>What is it?</b>", "options": ["fire station", "hospital", "farm", "house"], "answer": 0, "explain": "It is a fire station."}, {"tag": "fire station", "prompt": "People come to this place. <b>Who works here?</b>", "options": ["firefighter", "doctor", "engineer", "chef"], "answer": 0, "explain": "A firefighter works here."}, {"tag": "fire station", "prompt": "This place is for fire trucks are here. <b>Is it a fire station?</b>", "options": ["Yes, it is.", "No, it isn't.", "Yes, he is.", "No, he is not."], "answer": 0, "explain": "We answer: Yes, it is."}, {"tag": "house", "prompt": "We live here with our family. <b>What is it?</b>", "options": ["house", "hospital", "farm", "fire station"], "answer": 0, "explain": "It is a house."}, {"tag": "house", "prompt": "People come to this place. <b>Who works here?</b>", "options": ["housewife", "pilot", "singer", "athlete"], "answer": 0, "explain": "A housewife works here."}, {"tag": "house", "prompt": "This place is for we live here with our family. <b>Is it a house?</b>", "options": ["Yes, it is.", "No, it isn't.", "Yes, he is.", "No, he is not."], "answer": 0, "explain": "We answer: Yes, it is."}, {"tag": "airport", "prompt": "Planes take off and land here. <b>What is it?</b>", "options": ["airport", "hospital", "farm", "fire station"], "answer": 0, "explain": "It is a airport."}, {"tag": "airport", "prompt": "People come to this place. <b>Who works here?</b>", "options": ["pilot", "postman", "zookeeper", "nurse"], "answer": 0, "explain": "A pilot works here."}, {"tag": "airport", "prompt": "This place is for planes take off and land here. <b>Is it a airport?</b>", "options": ["Yes, it is.", "No, it isn't.", "Yes, he is.", "No, he is not."], "answer": 0, "explain": "We answer: Yes, it is."}, {"tag": "police station", "prompt": "Police help people here. <b>What is it?</b>", "options": ["police station", "hospital", "farm", "fire station"], "answer": 0, "explain": "It is a police station."}, {"tag": "police station", "prompt": "People come to this place. <b>Who works here?</b>", "options": ["police", "actor", "chef", "engineer"], "answer": 0, "explain": "A police works here."}, {"tag": "police station", "prompt": "This place is for police help people here. <b>Is it a police station?</b>", "options": ["Yes, it is.", "No, it isn't.", "Yes, he is.", "No, he is not."], "answer": 0, "explain": "We answer: Yes, it is."}, {"tag": "post office", "prompt": "We send letters and parcels here. <b>What is it?</b>", "options": ["post office", "hospital", "farm", "fire station"], "answer": 0, "explain": "It is a post office."}, {"tag": "post office", "prompt": "People come to this place. <b>Who works here?</b>", "options": ["postman", "farmer", "teacher", "singer"], "answer": 0, "explain": "A postman works here."}, {"tag": "post office", "prompt": "This place is for we send letters and parcels here. <b>Is it a post office?</b>", "options": ["Yes, it is.", "No, it isn't.", "Yes, he is.", "No, he is not."], "answer": 0, "explain": "We answer: Yes, it is."}, {"tag": "classroom", "prompt": "We study with our teacher here. <b>What is it?</b>", "options": ["classroom", "hospital", "farm", "fire station"], "answer": 0, "explain": "It is a classroom."}, {"tag": "classroom", "prompt": "People come to this place. <b>Who works here?</b>", "options": ["teacher", "pupil", "chef", "vet"], "answer": 0, "explain": "A teacher works here."}, {"tag": "classroom", "prompt": "This place is for we study with our teacher here. <b>Is it a classroom?</b>", "options": ["Yes, it is.", "No, it isn't.", "Yes, he is.", "No, he is not."], "answer": 0, "explain": "We answer: Yes, it is."}, {"tag": "school", "prompt": "Children learn many subjects here. <b>What is it?</b>", "options": ["school", "hospital", "farm", "fire station"], "answer": 0, "explain": "It is a school."}, {"tag": "school", "prompt": "People come to this place. <b>Who works here?</b>", "options": ["pupil", "engineer", "nurse", "actor"], "answer": 0, "explain": "A pupil works here."}, {"tag": "school", "prompt": "This place is for children learn many subjects here. <b>Is it a school?</b>", "options": ["Yes, it is.", "No, it isn't.", "Yes, he is.", "No, he is not."], "answer": 0, "explain": "We answer: Yes, it is."}, {"tag": "zoo", "prompt": "We see many animals here. <b>What is it?</b>", "options": ["zoo", "hospital", "farm", "fire station"], "answer": 0, "explain": "It is a zoo."}, {"tag": "zoo", "prompt": "People come to this place. <b>Who works here?</b>", "options": ["zookeeper", "police", "pilot", "shopkeeper"], "answer": 0, "explain": "A zookeeper works here."}, {"tag": "zoo", "prompt": "This place is for we see many animals here. <b>Is it a zoo?</b>", "options": ["Yes, it is.", "No, it isn't.", "Yes, he is.", "No, he is not."], "answer": 0, "explain": "We answer: Yes, it is."}];
+
+    function shuffle(arr){
+      for(let i=arr.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]] = [arr[j],arr[i]];
+      }
+      return arr;
+    }
+
+    const QUESTIONS = shuffle([...BANK]);
+    let i = 0, score = 0;
+    const quiz = document.getElementById('quiz');
+    const bar = document.getElementById('bar');
+    const scoreBox = document.getElementById('scoreBox');
+    bar.max = QUESTIONS.length; bar.value = 0; scoreBox.textContent = `0 / ${QUESTIONS.length}`;
+
+    function render(){
+      if(i >= QUESTIONS.length) return summary();
+      const q = QUESTIONS[i];
+      bar.value = i;
+      scoreBox.textContent = `${score} / ${QUESTIONS.length}`;
+      quiz.innerHTML = `
+        <div class="small">Word: <b>${q.tag}</b> • Question ${i+1} of ${QUESTIONS.length}</div>
+        <div class="q">${q.prompt}</div>
+        <div class="options">
+          ${q.options.map((opt,idx)=>`
+            <button class="btn ghost" data-choice="${idx}">
+              <span class="choice">
+                <span class="badge">${String.fromCharCode(97+idx)}.</span>
+                <span>${opt}</span>
+              </span>
+            </button>`).join('')}
+        </div>
+        <div class="state" id="state"></div>
+        <div class="footer">
+          <button class="btn pill ghost" id="skip">Skip</button>
+          <button class="btn pill primary" id="next" disabled>Next</button>
+          <button class="btn pill ghost" id="retry">Restart</button>
+        </div>`;
+      bind(q);
+    }
+
+    function bind(q){
+      const btns = [...document.querySelectorAll('[data-choice]')];
+      const state = document.getElementById('state');
+      const next = document.getElementById('next');
+      const skip = document.getElementById('skip');
+      const retry = document.getElementById('retry');
+      let locked = false;
+
+      btns.forEach(b=>b.addEventListener('click',()=>{
+        if(locked) return; locked = true;
+        const c = +b.dataset.choice;
+        btns.forEach(x=>x.disabled = true);
+        next.disabled = false;
+        if(c===q.answer){
+          b.style.borderColor = "var(--correct)";
+          state.className = "state correct";
+          state.textContent = "Correct! " + q.explain;
+          score++;
+        }else{
+          b.style.borderColor = "var(--wrong)";
+          state.className = "state wrong";
+          state.textContent = "Not quite. " + q.explain + ` (Answer: ${String.fromCharCode(97+q.answer)}. ${q.options[q.answer]})`;
+          const right = btns.find(x=>+x.dataset.choice===q.answer);
+          right.style.borderColor = "var(--correct)";
+        }
+        scoreBox.textContent = `${score} / ${QUESTIONS.length}`;
+      }));
+
+      next.addEventListener('click', ()=>{ i++; render(); });
+      skip.addEventListener('click', ()=>{ i++; render(); });
+      retry.addEventListener('click', ()=>{ i=0; score=0; shuffle(QUESTIONS); render(); });
+    }
+
+    function summary(){
+      bar.value = QUESTIONS.length;
+      scoreBox.textContent = `${score} / ${QUESTIONS.length}`;
+      quiz.innerHTML = `
+        <div class="summary">
+          <h2>All done! 🎉</h2>
+          <p>Your score: <b>${score}</b> / <b>${QUESTIONS.length}</b></p>
+          <div class="footer">
+            <button class="btn pill primary" id="again">Try Again</button>
+          </div>
+          <p class="tips">Great practice! You can share this page link so kids can play on any phone or tablet.</p>
+        </div>`;
+      document.getElementById('again').addEventListener('click', ()=>{ i = 0; score = 0; shuffle(QUESTIONS); render(); });
+    }
+    render();
+  </script>
+</body>
+</html>
