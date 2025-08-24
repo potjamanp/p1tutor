@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unit 4: Jobs — Places Quiz (Shuffle)</title>
+  <meta name="description" content="Grade 1 English • Places vocabulary • 10 words × 3 = 30 questions • Options are shuffled so answers are not always at a." />
+  <style>
+    :root{
+      --bg:#f8fafc; --card:#ffffff; --text:#0f172a; --muted:#64748b;
+      --accent:#2563eb; --correct:#16a34a; --wrong:#dc2626;
+      --shadow:0 10px 28px rgba(2,6,23,.12); --radius:18px;
+    }
+    html,body{
+      margin:0; padding:0; background:var(--bg); color:var(--text);
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+    }
+    .container{max-width:760px;margin:0 auto;padding:28px 16px 72px;}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;}
+    h1{font-size:20px;margin:0 0 8px 0;}
+    .sub{color:var(--muted);font-size:14px;margin-bottom:12px}
+    .progress{display:flex;align-items:center;gap:10px;margin:4px 0 16px}
+    progress{width:100%;height:12px;-webkit-appearance:none;appearance:none;border:none;border-radius:999px;overflow:hidden;background:#e2e8f0}
+    progress::-webkit-progress-value{background:var(--accent)}
+    .small{font-size:13px;color:var(--muted)}
+    .q{font-size:18px;line-height:1.45;margin:8px 0 16px}
+    .options{display:grid;gap:10px}
+    .btn{
+      display:block;width:100%;text-align:left;border:2px solid #e2e8f0;border-radius:14px;background:#fff;
+      padding:14px;font-size:16px;cursor:pointer;transition:.15s box-shadow,.15s transform,.15s border-color;
+    }
+    .btn:hover{box-shadow:0 10px 24px rgba(2,6,23,.08);transform:translateY(-1px)}
+    .btn[disabled]{opacity:.6;pointer-events:none}
+    .choice{display:flex;align-items:center;gap:10px}
+    .badge{width:28px;height:28px;display:inline-grid;place-items:center;font-weight:700;border-radius:8px;background:#eef2ff;color:#111}
+    .state{margin-top:10px;font-size:15px;min-height:24px}
+    .state.correct{color:var(--correct)}
+    .state.wrong{color:var(--wrong)}
+    .footer{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+    .pill{border-radius:999px;padding:10px 16px;font-weight:600}
+    .primary{background:var(--accent);border-color:var(--accent);color:#fff;text-align:center}
+    .ghost{background:#fff;color:#111}
+    .meta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .score{font-size:14px;color:var(--muted)}
+    .summary h2{margin:0 0 8px 0}
+    .tips{font-size:13px;color:var(--muted);margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="meta">
+        <div>
+          <h1>Unit 4: Jobs — Places Quiz (Shuffle)</h1>
+          <div class="sub">10 places × 3 questions = 30 • Options shuffle every play</div>
+        </div>
+        <div class="score" id="scoreBox">0 / 0</div>
+      </div>
+      <div class="progress"><progress id="bar" max="0" value="0"></progress></div>
+      <div id="quiz"></div>
+      <div class="tips">Tip for parents: We avoid naming the place inside the prompt, so kids infer the correct answer.</div>
+    </div>
+  </div>
+
+  <script>
+    // ----- Places data (simple Grade 1 English) -----
+    const PLACES = [
+      ["hospital","We go here when we are sick.","doctor",["farmer","teacher","postman"]],
+      ["farm","We grow rice and vegetables here.","farmer",["pilot","police","teacher"]],
+      ["fire station","Fire trucks are here.","firefighter",["doctor","engineer","chef"]],
+      ["house","We live here with our family.","housewife",["pilot","singer","athlete"]],
+      ["airport","Planes take off and land here.","pilot",["postman","zookeeper","nurse"]],
+      ["police station","Police help people here.","police",["actor","chef","engineer"]],
+      ["post office","We send letters and parcels here.","postman",["farmer","teacher","singer"]],
+      ["classroom","We study with our teacher here.","teacher",["pupil","chef","vet"]],
+      ["school","Children learn many subjects here.","pupil",["engineer","nurse","actor"]],
+      ["zoo","We see many animals here.","zookeeper",["police","pilot","shopkeeper"]],
+    ];
+
+    // Utility shuffle
+    function shuffle(arr){
+      for(let i=arr.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]] = [arr[j],arr[i]];
+      }
+      return arr;
+    }
+
+    // Build 3 questions per place (What / Who / Yes-No)
+    function buildBank(){
+      const bank = [];
+      const placeNames = PLACES.map(p => p[0]);
+
+      for(const [place, whatDesc, whoCorrect, whoDistractors] of PLACES){
+        // Q1: What is it?
+        const distractPlaces = placeNames.filter(n => n !== place).slice(0,3);
+        bank.push({
+          tag: place,
+          prompt: `${whatDesc} <b>What is it?</b>`,
+          options: [place, ...distractPlaces],
+          answer: 0,
+          explain: `It is a ${place}.`
+        });
+
+        // Q2: Who works here?
+        bank.push({
+          tag: place,
+          prompt: `People come to this place. <b>Who works here?</b>`,
+          options: [whoCorrect, ...whoDistractors],
+          answer: 0,
+          explain: `A ${whoCorrect} works here.`
+        });
+
+        // Q3: Yes/No (keep simple: Yes is correct)
+        const descLower = whatDesc.toLowerCase().replace(/\.$/, "");
+        bank.push({
+          tag: place,
+          prompt: `This place is for ${descLower}. <b>Is it a ${place}?</b>`,
+          options: ["Yes, it is.","No, it isn't.","Yes, he is.","No, he is not."],
+          answer: 0,
+          explain: "We answer: Yes, it is."
+        });
+      }
+      return bank;
+    }
+
+    // Build and shuffle question order
+    const QUESTIONS = shuffle(buildBank());
+    let i = 0, score = 0;
+
+    const quiz = document.getElementById('quiz');
+    const bar = document.getElementById('bar');
+    const scoreBox = document.getElementById('scoreBox');
+    bar.max = QUESTIONS.length; bar.value = 0; scoreBox.textContent = `0 / ${QUESTIONS.length}`;
+
+    function render(){
+      if(i >= QUESTIONS.length) return summary();
+      const q = QUESTIONS[i];
+      bar.value = i;
+      scoreBox.textContent = `${score} / ${QUESTIONS.length}`;
+
+      // Shuffle options while tracking correct index
+      const idxs = [0,1,2,3];
+      shuffle(idxs);
+      const shuffledOptions = idxs.map(k => q.options[k]);
+      const correctIndex = idxs.indexOf(q.answer);
+
+      quiz.innerHTML = `
+        <div class="small">Word: <b>${q.tag}</b> • Question ${i+1} of ${QUESTIONS.length}</div>
+        <div class="q">${q.prompt}</div>
+        <div class="options">
+          ${shuffledOptions.map((opt,idx)=>`
+            <button class="btn ghost" data-choice="${idx}">
+              <span class="choice">
+                <span class="badge">${String.fromCharCode(97+idx)}.</span>
+                <span>${opt}</span>
+              </span>
+            </button>`).join('')}
+        </div>
+        <div class="state" id="state"></div>
+        <div class="footer">
+          <button class="btn pill ghost" id="skip">Skip</button>
+          <button class="btn pill primary" id="next" disabled>Next</button>
+          <button class="btn pill ghost" id="retry">Restart</button>
+        </div>`;
+
+      bind(correctIndex);
+    }
+
+    function bind(correctIndex){
+      const btns = [...document.querySelectorAll('[data-choice]')];
+      const state = document.getElementById('state');
+      const next = document.getElementById('next');
+      const skip = document.getElementById('skip');
+      const retry = document.getElementById('retry');
+      let locked = false;
+
+      btns.forEach(b => b.addEventListener('click', () => {
+        if(locked) return; locked = true;
+        const c = +b.dataset.choice;
+        btns.forEach(x => x.disabled = true);
+        next.disabled = false;
+
+        if(c === correctIndex){
+          b.style.borderColor = "var(--correct)";
+          state.className = "state correct";
+          state.textContent = "Correct!";
+          score++;
+        }else{
+          b.style.borderColor = "var(--wrong)";
+          state.className = "state wrong";
+          state.textContent = "Not quite.";
+          const right = btns[correctIndex];
+          right.style.borderColor = "var(--correct)";
+        }
+        scoreBox.textContent = `${score} / ${QUESTIONS.length}`;
+      }));
+
+      next.addEventListener('click', () => { i++; render(); });
+      skip.addEventListener('click', () => { i++; render(); });
+      retry.addEventListener('click', () => { i=0; score=0; shuffle(QUESTIONS); render(); });
+    }
+
+    function summary(){
+      bar.value = QUESTIONS.length;
+      scoreBox.textContent = `${score} / ${QUESTIONS.length}`;
+      quiz.innerHTML = `
+        <div class="summary">
+          <h2>All done! 🎉</h2>
+          <p>Your score: <b>${score}</b> / <b>${QUESTIONS.length}</b></p>
+          <div class="footer">
+            <button class="btn pill primary" id="again">Try Again</button>
+          </div>
+          <p class="tips">Options shuffle each time so answers won't always be at a.</p>
+        </div>`;
+      document.getElementById('again').addEventListener('click', () => {
+        i = 0; score = 0; shuffle(QUESTIONS); render();
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>
