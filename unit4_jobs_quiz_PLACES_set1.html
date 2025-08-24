@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Unit 4: Jobs — Places Quiz (Shuffle)</title>
-  <meta name="description" content="Grade 1 English • Places vocabulary • 10 words × 3 = 30 questions • Options are shuffled so answers are not always at a." />
+  <title>Unit 4: Jobs — Places Quiz (Shuffle, Named Place)</title>
+  <meta name="description" content="Grade 1 English • Places vocabulary • 10 words × 3 = 30 questions • Options are shuffled and prompts name the place." />
   <style>
     :root{
       --bg:#f8fafc; --card:#ffffff; --text:#0f172a; --muted:#64748b;
@@ -51,19 +51,19 @@
     <div class="card">
       <div class="meta">
         <div>
-          <h1>Unit 4: Jobs — Places Quiz (Shuffle)</h1>
+          <h1>Unit 4: Jobs — Places Quiz (Shuffle, Named Place)</h1>
           <div class="sub">10 places × 3 questions = 30 • Options shuffle every play</div>
         </div>
         <div class="score" id="scoreBox">0 / 0</div>
       </div>
       <div class="progress"><progress id="bar" max="0" value="0"></progress></div>
       <div id="quiz"></div>
-      <div class="tips">Tip for parents: We avoid naming the place inside the prompt, so kids infer the correct answer.</div>
+      <div class="tips">Prompts now name the place, e.g., “People come to the hospital. Who works here?”</div>
     </div>
   </div>
 
   <script>
-    // ----- Places data (simple Grade 1 English) -----
+    // ----- Places data -----
     const PLACES = [
       ["hospital","We go here when we are sick.","doctor",["farmer","teacher","postman"]],
       ["farm","We grow rice and vegetables here.","farmer",["pilot","police","teacher"]],
@@ -76,6 +76,12 @@
       ["school","Children learn many subjects here.","pupil",["engineer","nurse","actor"]],
       ["zoo","We see many animals here.","zookeeper",["police","pilot","shopkeeper"]],
     ];
+
+    // Articles for nicer wording (the + place)
+    function placeWithArticle(p){
+      // all of these sound natural with "the" before them
+      return "the " + p;
+    }
 
     // Utility shuffle
     function shuffle(arr){
@@ -102,10 +108,10 @@
           explain: `It is a ${place}.`
         });
 
-        // Q2: Who works here?
+        // Q2: Who works here? (now naming the place)
         bank.push({
           tag: place,
-          prompt: `People come to ${q.tag}. <b>Who works here?</b>`,
+          prompt: `People come to ${placeWithArticle(place)}. <b>Who works here?</b>`,
           options: [whoCorrect, ...whoDistractors],
           answer: 0,
           explain: `A ${whoCorrect} works here.`
@@ -146,7 +152,7 @@
       const correctIndex = idxs.indexOf(q.answer);
 
       quiz.innerHTML = `
-        <div class="small">• Question ${i+1} of ${QUESTIONS.length}</div>
+        <div class="small">Word: <b>${q.tag}</b> • Question ${i+1} of ${QUESTIONS.length}</div>
         <div class="q">${q.prompt}</div>
         <div class="options">
           ${shuffledOptions.map((opt,idx)=>`
