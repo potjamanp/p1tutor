@@ -62,7 +62,7 @@ function render(){
   const answerIndex = options.findIndex(t => t === q.correct);
 
   quiz.innerHTML = `
-    <div class="small">Word: <b>${q.tag}</b> • Question ${i+1} of ${QUESTIONS.length}</div>
+    <div class="small">• Question ${i+1} of ${QUESTIONS.length}</div>
     <div class="q">${q.prompt}</div>
     <div class="options">
       ${options.map((opt,idx)=>`
